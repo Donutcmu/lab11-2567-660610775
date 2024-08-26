@@ -5,11 +5,16 @@ export default function RegisterForm() {
   const [fname, setFname] = useState("");
   const [fnameError, setFnameError] = useState(false);
   const [lname, setLname] = useState("");
+  const [LnameError, setLnameError] = useState(false);
   const [plan, setPlan] = useState("");
+  const [PlanError, setPlanError] = useState(false);
   const [gender, setGender] = useState("");
+  const [genderError, setGenderError] = useState(false);
   const [buyBottle, setBuyBottle] = useState(false);
   const [buyShoes, setBuyShoes] = useState(false);
   const [buyCap, setBuyCap] = useState(false);
+  const [getDiscount,setDiscount] = useState(false);
+  const [isUserAgreed,isAccept] = useState(false);
 
   // ----------------------------------------------------------------
 
@@ -19,20 +24,25 @@ export default function RegisterForm() {
   };
 
   const inputLnameOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setLnameError(false);
     setLname(event.target.value);
   };
 
   const selectPlanOnChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setPlan(event.target.value);
+    setPlanError(false);
   };
 
   const radioGenderMaleOnChange = () => {
     setGender("male");
+    setGenderError(false);
   };
 
   const radioGenderFemaleOnChange = () => {
     setGender("female");
+    setGenderError(false);
   };
+
 
   const cbBuyBottleOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setBuyBottle(event.target.checked);
@@ -46,31 +56,83 @@ export default function RegisterForm() {
     setBuyCap(event.target.checked);
   };
 
+  const isAgreeOnChange = (event: React.ChangeEvent<HTMLInputElement>)=>{
+    isAccept(event.target.checked);
+  }
+
   // ----------------------------------------------------------------
 
   const computeTotalPayment = () => {
     let total = 0;
+    
     if (plan === "funrun") total += 500;
     if (plan === "mini") total += 800;
     if (plan === "half") total += 1200;
     if (plan === "full") total += 1500;
-    if (buyBottle) total += 200;
-    if (buyShoes) total += 600;
-    if (buyCap) total += 400;
+    if (buyBottle) {
+      total += 200;
+      
+      
+    }
+    if (buyShoes) {
+      total += 600;
+      
+    }
+    if (buyCap) {
+      total += 400;
+      
+
+    }
+    if(buyBottle&&buyShoes&&buyCap){
+      
+      total=total*0.8;
+      
+      
+    }
 
     return total;
   };
+  
 
   // ----------------------------------------------------------------
 
+  //const CheckGender = ()=>{
+    //let gendercheck="";
+    //if(gender===""){
+     // gendercheck = "Please select gender";
+      //return gendercheck;
+   //}
+   // return ;
+ // }
+
+
   const registerBtnOnClick = () => {
     let fnameOk = true;
+    let lnameOk = true;
+    let planOk = true;
+    let genderOk = true;
+    
     if (fname === "") {
       fnameOk = false;
       setFnameError(true);
     }
+    if (lname === "") {
+      lnameOk = false;
+      setLnameError(true);
+    }
+    if (plan === "") {
+      planOk = false;
+      setPlanError(true);
+    }
+    if(gender===""){
+      genderOk = false;
+      
+      
+      setGenderError(true); 
+      
+    }
 
-    if (fnameOk) {
+    if (fnameOk&&lnameOk&&planOk&&genderOk) {
       alert(
         `Registration complete. Please pay money for ${computeTotalPayment().toLocaleString()} THB.`
       );
@@ -83,7 +145,7 @@ export default function RegisterForm() {
       {/* First name & Last name */}
       <div className="d-flex gap-2">
         <div>
-          <label className="form-label">First name</label>
+          <label className="form-label needs-validation">First name</label>
           <input
             className={"form-control" + (fnameError ? " is-invalid" : "")}
             onChange={inputFnameOnChange}
@@ -92,9 +154,9 @@ export default function RegisterForm() {
           <div className="invalid-feedback">Invalid first name</div>
         </div>
         <div>
-          <label className="form-label">Last name</label>
+          <label className="form-label needs-validation">Last name</label>
           <input
-            className="form-control"
+            className={"form-control" + (LnameError ? " is-invalid":"")}
             onChange={inputLnameOnChange}
             value={lname}
           />
@@ -104,9 +166,9 @@ export default function RegisterForm() {
 
       {/* Running Plan */}
       <div>
-        <label className="form-label">Plan</label>
+        <label className="form-label needs-validation">Plan</label>
         <select
-          className="form-select"
+          className={"form-select"+(PlanError ? " is-invalid":"")}
           onChange={selectPlanOnChange}
           value={plan}
         >
@@ -121,7 +183,7 @@ export default function RegisterForm() {
 
       {/* Gender */}
       <div>
-        <label className="form-label">Gender</label>
+        <label className="form-label" >Gender</label>
         <div>
           <input
             className="me-2 form-check-input"
@@ -140,7 +202,9 @@ export default function RegisterForm() {
           {/* To show error when user did not select gender, */}
           {/* We just have to render the div below (Not using is-invalid bootstrap class) */}
           {/* <div className="text-danger">Please select gender</div> */}
+
         </div>
+        {genderError&&<div className="text-danger">Please select gender</div>}
       </div>
 
       {/* Extra Items */}
@@ -184,11 +248,15 @@ export default function RegisterForm() {
         Total Payment : {computeTotalPayment().toLocaleString()} THB
         {/* Render below element conditionally when user get 20% discount */}
         {/* <span className="text-success d-block">(20% Discounted)</span> */}
+        {buyBottle&&buyCap&&buyShoes?<span className="text-success d-block">(20% Discounted)</span>:""}
+        
       </div>
-
+      <div>
+        
+      </div>
       {/* Terms and conditions */}
       <div>
-        <input className="me-2" type="checkbox" />I agree to the terms and
+        <input className="me-2" type="checkbox" onChange={isAgreeOnChange} checked={isUserAgreed} />I agree to the terms and
         conditions
       </div>
 
@@ -197,7 +265,7 @@ export default function RegisterForm() {
         className="btn btn-success my-2"
         onClick={registerBtnOnClick}
         //You can embbed a state like below to disabled the button
-        //disabled={isUserAgreed}
+        disabled={!isUserAgreed}
       >
         Register
       </button>
